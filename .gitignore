@@ -124,3 +124,11 @@ dist
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# eclipse
+.settings/
+.classpath
+.project
+
+# Java
+target/
