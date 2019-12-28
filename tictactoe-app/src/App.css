@@ -1,38 +1,57 @@
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
   align-items: center;
+  background-color: #AE02E3;
+  display: flex;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  min-height: 100vh;
+}
+
+.board {
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: -1px 2px 15px gray;
+  display: flex;
+  flex-flow: row wrap;
+  max-width: 352px;
+  min-height: 352px;
+  padding: 5px;
+  position: relative;
+  width: 100%;
+  z-index: 10;
+}
+
+.square {
+  background: none;
+  border: 2px solid #898989;
+  border-radius: 5px;
+  cursor: pointer;
+  flex: 30%;
+  margin: 4px;
+  width: 100%;
+  outline: none;
+  position: relative;
+  transition: 200ms;
+}
+.square:focus, .square:hover {
+  background-color: #F6F6F6;
+}
+
+.squareContent {
+  font-size: 3em;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bold;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.messages {
+  text-align: center;
+  text-transform: uppercase;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bold;
+  position: absolute;
+  top: -40px;
   color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
