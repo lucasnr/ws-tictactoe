@@ -1,0 +1,22 @@
+.square {
+  background: none;
+  border: 2px solid #858585;
+  border-radius: 5px;
+  width: 100%;
+  outline: none;
+  position: relative;
+  transition: 200ms;
+}
+.square:focus, .square:hover {
+  border-color: #AE02E3;
+}
+
+.square__content {
+  font-size: 3em;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bold;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}

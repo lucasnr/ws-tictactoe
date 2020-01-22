@@ -1,45 +1,47 @@
 import React from 'react';
 
-// import { Container } from './styles';
+import Square from '../Square';
+import { initSocket } from '../../services/socket';
+
+import './styles.css';
 
 export default class Board extends React.Component {
 
   constructor() {
     super();
     this.state = {
-      pointerEvents: "none",
       otherPlayerMoves: [],
+      pointerEvents: "none",
     }
-
-    const code = document.location.pathname;
-    this.ws = new WebSocket(`ws://192.168.0.103:8080/tictactoe/game${code}`);
-    this.ws.onmessage = ({ data }) => {
-      console.log(data); // famoso logger
-      const response = JSON.parse(data);
-      if(response.code === "INFORMATIONAL")
-        this.setState({ message: response.text });
-      else if(response.code === "GAMESTART")
-        this.setState({ 
-          message: response.text, 
-          char: response.player_char, 
-          player: response.player_char === "X" ? 1 : 2
-        });
-      else if(response.code === "PLAYER_QUITED")
-        this.setState({ message: response.text, pointerEvents: "none" })
-      else if(response.code === "YOUR_TURN")
-        this.setState({ message: response.text, pointerEvents: "auto" })
-      else if(response.code === "PLAYER_MOVE") {
-        let { otherPlayerMoves } = this.state;
-        otherPlayerMoves.push(response.position);
-        this.setState({ otherPlayerMoves }); // say what now?
-      }
-
-    };
   }
 
-  clickAction(position) {
+  componentDidMount() {
+    this._socket = initSocket();
+    this._socket.onmessage = ({ data }) => {
+      const response = JSON.parse(data);
+      console.log(response); // famoso logger
+
+      if(response.code === "INFORMATIONAL") {
+        this.setState({ message: response.text });
+      } else if(response.code === "GAMESTART") {
+        const { text, player_char } = response;
+        this.setState({ message: text, char: player_char, player: player_char === "X" ? 1 : 2 });
+      } else if(response.code === "PLAYER_QUITED") {
+        this.setState({ message: response.text, pointerEvents: "none" });
+      } else if(response.code === "YOUR_TURN") {
+        this.setState({ message: response.text, pointerEvents: "auto" });
+      } else if(response.code === "PLAYER_MOVE") {
+        const otherPlayerMove = response.position;
+        let { otherPlayerMoves } = this.state;
+        otherPlayerMoves.push(otherPlayerMove);
+        this.setState({ otherPlayerMoves }); // say what now?
+      }
+    }
+  }
+
+  _clickAction(position) {
     const { player, char } = this.state;
-    this.ws.send(JSON.stringify({
+    this._socket.send(JSON.stringify({
       player,
       position,
       player_char: char,
@@ -54,15 +56,10 @@ export default class Board extends React.Component {
 
     const squares = [];
     for (let index = 0; index < 9; index++) {
-
-      let avaliable = true;
-      otherPlayerMoves.forEach(otherPlayerMove => {
-        if ( (index + 1) === otherPlayerMove)
-          avaliable = false;
-      });
+      const avaliable = ! otherPlayerMoves.some(item => (index + 1) === item);
       squares[index] = (
         <Square key={index} avaliable={avaliable} 
-          callback={() => this.clickAction(index+1)} char={char} />
+          callback={() => this._clickAction(index + 1)} char={char} />
       )
     }
 
@@ -71,38 +68,6 @@ export default class Board extends React.Component {
         <div className="messages">{message}</div>
         {squares}
       </div>
-    );
-  }
-}
-
-class Square extends React.Component {
-
-  constructor(props) {
-    super(props);
-    this.state = { pressed: false };
-  }
-
-  action() {
-    if(this.state.pressed || ! this.props.avaliable)
-      return;
-
-    this.props.callback();
-    this.setState({ pressed: true });
-  }
-
-  render() {
-    let { char, avaliable } = this.props;
-    
-    if(! avaliable) {
-      char = char === "X" ? "O" : "X";
-    }
-    
-    return (
-      <button onClick={this.action.bind(this)} className="square">
-        {( this.state.pressed || ! avaliable ) && 
-          <span className="squareContent">{char}</span>
-        }
-      </button>
     );
   }
 }
